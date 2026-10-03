@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>3D Calculator — Three.js</title>
+  <link rel="stylesheet" href="style.css" />
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <canvas id="scene"></canvas>
+
+  <header class="hud top">
+    <div>
+      <h1>3D Calculator</h1>
+      <p>Three.js • click the 3D keys, or type on your keyboard • drag to orbit</p>
+    </div>
+    <div class="display-2d">
+      <span id="expr2d">0</span>
+    </div>
+  </header>
+
+  <footer class="hud bottom">
+    <div class="hint">
+      <span><b>Click / Tap</b> keys</span>
+      <span><b>Drag</b> to rotate</span>
+      <span><b>Scroll</b> to zoom</span>
+      <span><b>C</b> clear • <b>Backspace</b> delete • <b>Enter</b> =</span>
+    </div>
+    <div class="actions">
+      <button id="btn-spin">Auto-rotate: on</button>
+      <button id="btn-reset">Reset view</button>
+    </div>
+  </footer>
+
+  <div id="toast"></div>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>
