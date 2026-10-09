@@ -1,3 +1,10 @@
+:root {
+  --accent: #22d3ee;
+  --bg: #05070e;
+  --glass: rgba(10, 14, 28, 0.72);
+  --line: rgba(255, 255, 255, 0.14);
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body {
@@ -5,7 +12,7 @@ html, body {
   height: 100%;
   overflow: hidden;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  background: radial-gradient(1200px 800px at 50% 20%, #1c2440 0%, #0b0e1a 55%, #05070e 100%);
+  background: radial-gradient(1200px 800px at 50% 18%, #1c2440 0%, #0b0e1a 55%, #05070e 100%);
   color: #eef2ff;
 }
 
@@ -16,7 +23,9 @@ html, body {
   height: 100%;
   display: block;
   touch-action: none;
+  cursor: grab;
 }
+#scene:active { cursor: grabbing; }
 
 .hud {
   position: fixed;
@@ -25,9 +34,10 @@ html, body {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 20px 22px;
+  padding: 18px 20px;
   pointer-events: none;
   z-index: 5;
+  gap: 14px;
 }
 
 .hud.top { top: 0; }
@@ -37,7 +47,7 @@ html, body {
   align-items: flex-end;
 }
 
-.hud h1 {
+.brand h1 {
   font-size: clamp(22px, 3vw, 34px);
   letter-spacing: 0.5px;
   font-weight: 800;
@@ -47,40 +57,143 @@ html, body {
   color: transparent;
 }
 
-.hud p {
+.brand p {
   margin-top: 6px;
   opacity: 0.72;
   font-size: 13px;
+  max-width: 46vw;
+}
+
+.chips { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.chip {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid var(--line);
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+}
+.chip.accent {
+  border-color: color-mix(in srgb, var(--accent) 60%, transparent);
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
 }
 
 .display-2d {
   pointer-events: auto;
-  min-width: 200px;
-  max-width: 46vw;
+  min-width: 260px;
+  max-width: 44vw;
   text-align: right;
-  background: rgba(10, 14, 28, 0.72);
-  border: 1px solid rgba(255,255,255,0.14);
-  border-radius: 14px;
-  padding: 10px 16px;
+  background: var(--glass);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 12px 16px 10px;
   font-variant-numeric: tabular-nums;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.04);
+  border-top: 2px solid color-mix(in srgb, var(--accent) 70%, transparent);
 }
 
-.display-2d span {
+.expr-row span {
+  display: block;
   font-size: clamp(18px, 2.4vw, 26px);
   font-weight: 700;
   letter-spacing: 0.5px;
   word-break: break-all;
+  min-height: 1.4em;
+  opacity: 0.95;
 }
+.preview-row span {
+  display: block;
+  margin-top: 2px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent);
+  min-height: 1.3em;
+  word-break: break-all;
+}
+
+/* ---- history side panel ---- */
+.panel {
+  position: fixed;
+  left: 20px;
+  top: 170px;
+  width: 280px;
+  max-height: 52vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--glass);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 14px 40px rgba(0,0,0,0.4);
+  z-index: 6;
+  overflow: hidden;
+}
+.panel.collapsed #history-list,
+.panel.collapsed .panel-foot { display: none; }
+
+.panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 12px 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.panel-head h2 { font-size: 13px; letter-spacing: 1.2px; text-transform: uppercase; opacity: 0.85; }
+.panel-btns { display: flex; gap: 6px; }
+.panel-btns button,
+.mem-btns button {
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 6px 9px;
+  border-radius: 9px;
+  transition: background 0.15s, transform 0.15s;
+}
+.panel-btns button:hover, .mem-btns button:hover { background: rgba(255,255,255,0.18); transform: translateY(-1px); }
+
+#history-list {
+  list-style: none;
+  overflow-y: auto;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 60px;
+}
+#history-list li {
+  cursor: pointer;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 12.5px;
+  line-height: 1.35;
+  transition: border-color 0.15s, background 0.15s;
+}
+#history-list li:hover { border-color: var(--accent); background: rgba(255,255,255,0.09); }
+#history-list .h-expr { opacity: 0.75; word-break: break-all; }
+#history-list .h-res { font-weight: 800; color: var(--accent); font-size: 13.5px; }
+#history-list .empty { cursor: default; opacity: 0.6; text-align: center; }
+
+.panel-foot { padding: 10px 12px 12px; border-top: 1px solid rgba(255,255,255,0.08); }
+.mem-row { display: flex; justify-content: space-between; font-size: 12px; opacity: 0.9; margin-bottom: 8px; }
+.mem-row strong { font-variant-numeric: tabular-nums; }
+.mem-btns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
 
 .hint {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
   opacity: 0.85;
   font-size: 12.5px;
-  max-width: 60vw;
+  max-width: 52vw;
 }
 
 .hint span {
@@ -92,8 +205,10 @@ html, body {
 
 .actions {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   pointer-events: auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .actions button {
@@ -101,10 +216,12 @@ html, body {
   border: 1px solid rgba(255,255,255,0.18);
   background: rgba(255,255,255,0.1);
   color: white;
-  padding: 10px 14px;
+  padding: 10px 13px;
   border-radius: 12px;
   font-weight: 600;
+  font-size: 12.5px;
   transition: transform 0.15s, background 0.15s;
+  white-space: nowrap;
 }
 
 .actions button:hover {
@@ -127,15 +244,20 @@ html, body {
   transition: opacity 0.25s, transform 0.25s;
   pointer-events: none;
   z-index: 10;
+  max-width: 80vw;
 }
-
+#toast.ok { background: #059669; }
 #toast.show {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
 
+@media (max-width: 900px) {
+  .panel { display: none; }
+}
 @media (max-width: 640px) {
   .hud { flex-direction: column; gap: 12px; }
   .display-2d { max-width: 100%; width: 100%; }
+  .brand p { max-width: 100%; }
   .hint { max-width: 100%; }
 }

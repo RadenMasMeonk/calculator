@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>3D Calculator — Three.js</title>
+  <title>3D Scientific Calculator — Three.js</title>
   <link rel="stylesheet" href="style.css" />
   <script type="importmap">
   {
@@ -18,23 +18,54 @@
   <canvas id="scene"></canvas>
 
   <header class="hud top">
-    <div>
-      <h1>3D Calculator</h1>
-      <p>Three.js • click the 3D keys, or type on your keyboard • drag to orbit</p>
+    <div class="brand">
+      <h1>3D Scientific Calculator</h1>
+      <p>Three.js • click the 3D keys, or type • drag to orbit • scroll to zoom</p>
+      <div class="chips">
+        <span class="chip" id="mem-badge" title="Memory register">M: 0</span>
+        <span class="chip" id="ans-badge" title="Last answer">ANS: —</span>
+        <span class="chip accent" id="mode-badge">DEG • EXPR</span>
+      </div>
     </div>
     <div class="display-2d">
-      <span id="expr2d">0</span>
+      <div class="expr-row"><span id="expr2d">0</span></div>
+      <div class="preview-row"><span id="preview2d">= 0</span></div>
     </div>
   </header>
 
+  <aside class="panel" id="history-panel">
+    <div class="panel-head">
+      <h2>History</h2>
+      <div class="panel-btns">
+        <button id="btn-copy-history" title="Copy last result">Copy</button>
+        <button id="btn-clear-history" title="Clear history">Clear</button>
+        <button id="btn-toggle-panel" title="Collapse">–</button>
+      </div>
+    </div>
+    <ul id="history-list"></ul>
+    <div class="panel-foot">
+      <div class="mem-row">
+        <span>Memory</span>
+        <strong id="mem-value">0</strong>
+      </div>
+      <div class="mem-btns">
+        <button data-mem="MC">MC</button>
+        <button data-mem="MR">MR</button>
+        <button data-mem="M+">M+</button>
+        <button data-mem="M-">M−</button>
+      </div>
+    </div>
+  </aside>
+
   <footer class="hud bottom">
     <div class="hint">
-      <span><b>Click / Tap</b> keys</span>
-      <span><b>Drag</b> to rotate</span>
-      <span><b>Scroll</b> to zoom</span>
-      <span><b>C</b> clear • <b>Backspace</b> delete • <b>Enter</b> =</span>
+      <span><b>0-9 . ( ) % ^</b> type expression</span>
+      <span><b>s</b> √ • <b>p</b> π • <b>Enter</b> =</span>
+      <span><b>C / Esc</b> clear • <b>Backspace</b> delete</span>
     </div>
     <div class="actions">
+      <button id="btn-sound" title="Toggle click sound">Sound: on</button>
+      <button id="btn-theme" title="Cycle accent theme">Theme: cyan</button>
       <button id="btn-spin">Auto-rotate: on</button>
       <button id="btn-reset">Reset view</button>
     </div>
