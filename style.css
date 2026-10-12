@@ -229,6 +229,18 @@ html, body {
   transform: translateY(-1px);
 }
 
+#btn-model {
+  border-color: color-mix(in srgb, var(--accent) 60%, transparent);
+  background: color-mix(in srgb, var(--accent) 16%, rgba(255,255,255,0.08));
+  font-weight: 800;
+}
+
+#model-badge {
+  border-color: rgba(255,255,255,0.22);
+  background: rgba(255,255,255,0.1);
+  font-weight: 800;
+}
+
 #toast {
   position: fixed;
   left: 50%;

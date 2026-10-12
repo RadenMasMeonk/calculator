@@ -359,6 +359,7 @@ scene.add(rim);
 const under = new THREE.PointLight(0x22d3ee, 14, 14);
 under.position.set(0, -1.5, 3.5);
 scene.add(under);
+let baseUnderIntensity = 14;
 
 // ground + grid
 const ground = new THREE.Mesh(
@@ -408,27 +409,29 @@ edge.position.z = -0.22;
 calc.add(edge);
 
 /* ---- extra detail: brand plate, solar panel, screws ---- */
-function makePlateTexture() {
+function makePlateTexture(model = null) {
   const c = document.createElement('canvas');
   c.width = 1024; c.height = 128;
   const x = c.getContext('2d');
-  x.fillStyle = '#0b1226';
+  const light = model?.lightPlate === true;
+  x.fillStyle = model?.plateBg || '#0b1226';
   x.fillRect(0, 0, 1024, 128);
-  x.fillStyle = '#e2e8f0';
+  x.fillStyle = light ? '#0f172a' : '#e2e8f0';
   x.font = '800 52px Inter, Arial';
   x.textAlign = 'left';
   x.textBaseline = 'middle';
-  x.fillText('SPARK  FX-3D  SCIENTIFIC', 36, 52);
-  x.fillStyle = '#67e8f9';
+  const title = model ? `SPARK  ${model.plateTag}  SCIENTIFIC` : 'SPARK  FX-3D  SCIENTIFIC';
+  x.fillText(title, 36, 52);
+  x.fillStyle = light ? '#0e7490' : '#67e8f9';
   x.font = '600 30px Inter, Arial';
-  x.fillText('30-KEY  •  EXPRESSION  •  MEMORY  •  HISTORY', 36, 98);
+  x.fillText(model ? model.plateSub : '30-KEY  •  EXPRESSION  •  MEMORY  •  HISTORY', 36, 98);
   const t = new THREE.CanvasTexture(c);
   t.colorSpace = THREE.SRGBColorSpace;
   return t;
 }
 const plate = new THREE.Mesh(
   new THREE.PlaneGeometry(4.4, 0.55),
-  new THREE.MeshBasicMaterial({ map: makePlateTexture(), transparent: true })
+  new THREE.MeshBasicMaterial({ map: makePlateTexture(null), transparent: true })
 );
 plate.position.set(-1.1, 5.0, 0.47);
 calc.add(plate);
@@ -646,7 +649,7 @@ const THEMES = [
 ];
 let themeIdx = 0;
 function applyTheme(i) {
-  themeIdx = i % THEMES.length;
+  themeIdx = ((i % THEMES.length) + THEMES.length) % THEMES.length;
   const t = THEMES[themeIdx];
   document.documentElement.style.setProperty('--accent', t.css);
   edgeMat.color.setHex(t.hex);
@@ -654,12 +657,80 @@ function applyTheme(i) {
   document.getElementById('btn-theme').textContent = 'Theme: ' + t.name;
 }
 
+/* ---- calculator 3D models (appearance variants) ---- */
+const CALCULATOR_MODELS = [
+  {
+    id: 'onyx', name: 'Onyx Pro', plateTag: 'FX-3D ONYX', plateSub: '30-KEY  •  EXPRESSION  •  MEMORY  •  HISTORY',
+    plateBg: '#0b1226', lightPlate: false,
+    body: { color: 0x111827, roughness: 0.35, metalness: 0.55, w: 7.9, h: 11.2, d: 0.9, r: 0.28 },
+    edgeOpacity: 0.14, underIntensity: 14,
+  },
+  {
+    id: 'neon', name: 'Neon Cyber', plateTag: 'FX-NEON CYBER', plateSub: 'SLIM  •  HIGH-GLOSS  •  GLOW EDGE',
+    plateBg: '#020617', lightPlate: false,
+    body: { color: 0x070b1d, roughness: 0.18, metalness: 0.85, w: 8.1, h: 11.5, d: 0.7, r: 0.22 },
+    edgeOpacity: 0.38, underIntensity: 22,
+  },
+  {
+    id: 'arctic', name: 'Arctic White', plateTag: 'FX-ARCTIC WHITE', plateSub: 'MATTE  •  LIGHT BODY  •  SOFT SHADOW',
+    plateBg: '#f1f5f9', lightPlate: true,
+    body: { color: 0xe2e8f0, roughness: 0.45, metalness: 0.15, w: 7.7, h: 11.0, d: 1.0, r: 0.32 },
+    edgeOpacity: 0.2, underIntensity: 10,
+  },
+  {
+    id: 'retro', name: 'Retro Amber', plateTag: 'FX-RETRO AMBER', plateSub: 'CHUNKY  •  WARM  •  CLASSIC KEYS',
+    plateBg: '#1c0a00', lightPlate: false,
+    body: { color: 0x292524, roughness: 0.6, metalness: 0.3, w: 8.0, h: 11.0, d: 1.15, r: 0.18 },
+    edgeOpacity: 0.22, underIntensity: 16,
+  },
+];
+let modelIdx = 0;
+try {
+  const saved = parseInt(localStorage.getItem('calc3d-model') || '0', 10);
+  if (!Number.isNaN(saved) && saved >= 0 && saved < CALCULATOR_MODELS.length) modelIdx = saved;
+} catch { modelIdx = 0; }
+
+function applyModel(i, announce = false) {
+  modelIdx = ((i % CALCULATOR_MODELS.length) + CALCULATOR_MODELS.length) % CALCULATOR_MODELS.length;
+  const m = CALCULATOR_MODELS[modelIdx];
+  try { localStorage.setItem('calc3d-model', String(modelIdx)); } catch {}
+  // body material + geometry (variant silhouette)
+  bodyMat.color.setHex(m.body.color);
+  bodyMat.roughness = m.body.roughness;
+  bodyMat.metalness = m.body.metalness;
+  bodyMat.needsUpdate = true;
+  body.geometry.dispose();
+  body.geometry = new RoundedBoxGeometry(m.body.w, m.body.h, m.body.d, 6, m.body.r);
+  // glow edge follows body, slightly larger
+  edgeMat.opacity = m.edgeOpacity;
+  edge.geometry.dispose();
+  edge.geometry = new RoundedBoxGeometry(m.body.w + 0.15, m.body.h + 0.15, Math.max(0.4, m.body.d - 0.4), 4, m.body.r + 0.02);
+  // under-glow baseline per model
+  baseUnderIntensity = m.underIntensity;
+  under.intensity = baseUnderIntensity;
+  // brand plate redraw
+  const oldMap = plate.material.map;
+  plate.material.map = makePlateTexture(m);
+  plate.material.needsUpdate = true;
+  if (oldMap) oldMap.dispose();
+  // HUD / button
+  const btn = document.getElementById('btn-model');
+  if (btn) btn.textContent = 'Model: ' + m.name;
+  const badge = document.getElementById('model-badge');
+  if (badge) badge.textContent = 'MODEL: ' + m.name;
+  if (announce) showToast('Model: ' + m.name, true);
+}
+function cycleModel(dir = 1) {
+  applyModel(modelIdx + dir, true);
+  blip(620, 0.07);
+}
+
 /* ---- key handling ---- */
 function press(mesh) {
   mesh.userData.press = 1;
   handleKey(mesh.userData.label);
-  under.intensity = 24;
-  setTimeout(() => (under.intensity = 14), 120);
+  under.intensity = baseUnderIntensity + 10;
+  setTimeout(() => (under.intensity = baseUnderIntensity), 120);
 }
 
 function handleKey(label) {
@@ -729,6 +800,7 @@ addEventListener('keydown', (e) => {
   else if (e.key === 'Enter' || e.key === '=') { doEquals(true); flash('='); }
   else if (e.key === 'Backspace') backspaceExpr();
   else if (e.key.toLowerCase() === 'c' || e.key === 'Escape') clearAll();
+  else if (e.key.toLowerCase() === 'm') { cycleModel(1); return; }
   else return;
   blip(520, 0.05);
 });
@@ -751,6 +823,7 @@ document.getElementById('btn-sound').onclick = (e) => {
   e.target.textContent = `Sound: ${soundOn ? 'on' : 'off'}`;
 };
 document.getElementById('btn-theme').onclick = () => applyTheme(themeIdx + 1);
+document.getElementById('btn-model').onclick = () => cycleModel(1);
 document.getElementById('btn-clear-history').onclick = () => {
   history = [];
   try { localStorage.removeItem('calc3d-history'); } catch {}
@@ -793,6 +866,7 @@ addEventListener('resize', () => {
 });
 
 applyTheme(0);
+applyModel(modelIdx, false);
 renderHistory();
 updateDisplay();
 tick();
