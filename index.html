@@ -63,15 +63,33 @@
       <span><b>0-9 . ( ) % ^</b> type expression</span>
       <span><b>s</b> √ • <b>p</b> π • <b>Enter</b> =</span>
       <span><b>C / Esc</b> clear • <b>Backspace</b> delete</span>
+      <span><b>M</b> models • <b>1–7</b> pick</span>
     </div>
     <div class="actions">
-      <button id="btn-model" title="Change calculator 3D model (M)">Model: Onyx Pro</button>
+      <button id="btn-model" title="Pick calculator 3D model (M)">Model: Onyx Pro ▾</button>
       <button id="btn-sound" title="Toggle click sound">Sound: on</button>
       <button id="btn-theme" title="Cycle accent theme">Theme: cyan</button>
       <button id="btn-spin">Auto-rotate: on</button>
       <button id="btn-reset">Reset view</button>
     </div>
   </footer>
+
+  <div id="model-modal" class="modal hidden" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="model-title">
+      <div class="modal-head">
+        <div>
+          <h2 id="model-title">Choose 3D model</h2>
+          <p>Pick a body style — keys <b>1–7</b> select, <b>← →</b> preview, <b>Esc</b> closes.</p>
+        </div>
+        <button id="btn-model-close" title="Close (Esc)">✕</button>
+      </div>
+      <div id="model-grid" class="model-grid"></div>
+      <div class="modal-foot">
+        <button id="btn-model-prev" title="Previous model">← Prev</button>
+        <button id="btn-model-next" title="Next model">Next →</button>
+      </div>
+    </div>
+  </div>
 
   <div id="toast"></div>
 

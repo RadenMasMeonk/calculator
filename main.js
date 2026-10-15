@@ -658,30 +658,62 @@ function applyTheme(i) {
 }
 
 /* ---- calculator 3D models (appearance variants) ---- */
+const BASE_KEY_COLORS = { ...COLORS };
 const CALCULATOR_MODELS = [
   {
-    id: 'onyx', name: 'Onyx Pro', plateTag: 'FX-3D ONYX', plateSub: '30-KEY  •  EXPRESSION  •  MEMORY  •  HISTORY',
-    plateBg: '#0b1226', lightPlate: false,
+    id: 'onyx', name: 'Onyx Pro', desc: 'Classic dark • balanced glow',
+    plateTag: 'FX-3D ONYX', plateSub: '30-KEY  •  EXPRESSION  •  MEMORY  •  HISTORY',
+    plateBg: '#0b1226', lightPlate: false, swatch: '#111827',
     body: { color: 0x111827, roughness: 0.35, metalness: 0.55, w: 7.9, h: 11.2, d: 0.9, r: 0.28 },
-    edgeOpacity: 0.14, underIntensity: 14,
+    edgeOpacity: 0.14, underIntensity: 14, keys: null,
   },
   {
-    id: 'neon', name: 'Neon Cyber', plateTag: 'FX-NEON CYBER', plateSub: 'SLIM  •  HIGH-GLOSS  •  GLOW EDGE',
-    plateBg: '#020617', lightPlate: false,
+    id: 'neon', name: 'Neon Cyber', desc: 'Slim • high-gloss • strong glow',
+    plateTag: 'FX-NEON CYBER', plateSub: 'SLIM  •  HIGH-GLOSS  •  GLOW EDGE',
+    plateBg: '#020617', lightPlate: false, swatch: '#070b1d',
     body: { color: 0x070b1d, roughness: 0.18, metalness: 0.85, w: 8.1, h: 11.5, d: 0.7, r: 0.22 },
     edgeOpacity: 0.38, underIntensity: 22,
+    keys: { n: 0x0f172a, fn: 0x334155, op: 0xdb2777, eq: 0x22d3ee, mem: 0x7c3aed, sci: 0x0d9488 },
   },
   {
-    id: 'arctic', name: 'Arctic White', plateTag: 'FX-ARCTIC WHITE', plateSub: 'MATTE  •  LIGHT BODY  •  SOFT SHADOW',
-    plateBg: '#f1f5f9', lightPlate: true,
+    id: 'arctic', name: 'Arctic White', desc: 'Matte light • soft shadow',
+    plateTag: 'FX-ARCTIC WHITE', plateSub: 'MATTE  •  LIGHT BODY  •  SOFT SHADOW',
+    plateBg: '#f1f5f9', lightPlate: true, swatch: '#e2e8f0',
     body: { color: 0xe2e8f0, roughness: 0.45, metalness: 0.15, w: 7.7, h: 11.0, d: 1.0, r: 0.32 },
     edgeOpacity: 0.2, underIntensity: 10,
+    keys: { n: 0x334155, fn: 0x94a3b8, op: 0xf59e0b, eq: 0x0ea5e9, mem: 0x8b5cf6, sci: 0x14b8a6 },
   },
   {
-    id: 'retro', name: 'Retro Amber', plateTag: 'FX-RETRO AMBER', plateSub: 'CHUNKY  •  WARM  •  CLASSIC KEYS',
-    plateBg: '#1c0a00', lightPlate: false,
+    id: 'retro', name: 'Retro Amber', desc: 'Chunky • warm • classic',
+    plateTag: 'FX-RETRO AMBER', plateSub: 'CHUNKY  •  WARM  •  CLASSIC KEYS',
+    plateBg: '#1c0a00', lightPlate: false, swatch: '#292524',
     body: { color: 0x292524, roughness: 0.6, metalness: 0.3, w: 8.0, h: 11.0, d: 1.15, r: 0.18 },
     edgeOpacity: 0.22, underIntensity: 16,
+    keys: { n: 0x44403c, fn: 0x78716c, op: 0xb45309, eq: 0xfbbf24, mem: 0x92400e, sci: 0x65730f },
+  },
+  {
+    id: 'mint', name: 'Mint Fresh', desc: 'Pastel green • matte • airy',
+    plateTag: 'FX-MINT FRESH', plateSub: 'PASTEL  •  MATTE  •  LIGHT KEYS',
+    plateBg: '#ecfdf5', lightPlate: true, swatch: '#a7f3d0',
+    body: { color: 0xd1fae5, roughness: 0.5, metalness: 0.08, w: 7.7, h: 11.1, d: 0.95, r: 0.34 },
+    edgeOpacity: 0.24, underIntensity: 9,
+    keys: { n: 0x065f46, fn: 0x6ee7b7, op: 0xf59e0b, eq: 0x10b981, mem: 0x8b5cf6, sci: 0x0d9488 },
+  },
+  {
+    id: 'crimson', name: 'Crimson Esports', desc: 'Bold red • low glow • gamer',
+    plateTag: 'FX-CRIMSON ESPORTS', plateSub: 'BOLD  •  LOW-PROFILE  •  COMPETITION',
+    plateBg: '#160404', lightPlate: false, swatch: '#7f1d1d',
+    body: { color: 0x450a0a, roughness: 0.32, metalness: 0.6, w: 8.0, h: 11.3, d: 0.85, r: 0.2 },
+    edgeOpacity: 0.3, underIntensity: 18,
+    keys: { n: 0x1c1917, fn: 0x57534e, op: 0xef4444, eq: 0xf87171, mem: 0x7f1d1d, sci: 0x155e75 },
+  },
+  {
+    id: 'midnight', name: 'Midnight Glass', desc: 'Deep blue • metallic • tall',
+    plateTag: 'FX-MIDNIGHT GLASS', plateSub: 'METALLIC  •  TALL  •  DEEP BLUE',
+    plateBg: '#020617', lightPlate: false, swatch: '#1e3a8a',
+    body: { color: 0x1e1b4b, roughness: 0.22, metalness: 0.8, w: 7.8, h: 11.6, d: 0.8, r: 0.3 },
+    edgeOpacity: 0.34, underIntensity: 20,
+    keys: { n: 0x1e293b, fn: 0x475569, op: 0x38bdf8, eq: 0x818cf8, mem: 0x6d28d9, sci: 0x0e7490 },
   },
 ];
 let modelIdx = 0;
@@ -689,6 +721,14 @@ try {
   const saved = parseInt(localStorage.getItem('calc3d-model') || '0', 10);
   if (!Number.isNaN(saved) && saved >= 0 && saved < CALCULATOR_MODELS.length) modelIdx = saved;
 } catch { modelIdx = 0; }
+
+function applyKeyColors(m) {
+  const palette = { ...BASE_KEY_COLORS, ...(m.keys || {}) };
+  for (const b of pressables) {
+    const hex = palette[b.userData.kind] ?? BASE_KEY_COLORS.n;
+    b.material.color.setHex(hex);
+  }
+}
 
 function applyModel(i, announce = false) {
   modelIdx = ((i % CALCULATOR_MODELS.length) + CALCULATOR_MODELS.length) % CALCULATOR_MODELS.length;
@@ -713,16 +753,56 @@ function applyModel(i, announce = false) {
   plate.material.map = makePlateTexture(m);
   plate.material.needsUpdate = true;
   if (oldMap) oldMap.dispose();
+  // per-model key tints
+  applyKeyColors(m);
   // HUD / button
   const btn = document.getElementById('btn-model');
-  if (btn) btn.textContent = 'Model: ' + m.name;
+  if (btn) btn.textContent = `Model: ${m.name} ▾`;
   const badge = document.getElementById('model-badge');
   if (badge) badge.textContent = 'MODEL: ' + m.name;
+  refreshModelGrid();
   if (announce) showToast('Model: ' + m.name, true);
 }
 function cycleModel(dir = 1) {
   applyModel(modelIdx + dir, true);
   blip(620, 0.07);
+}
+
+/* ---- model picker modal (select, don't just cycle) ---- */
+const modelModal = () => document.getElementById('model-modal');
+function isModelPickerOpen() {
+  return !modelModal()?.classList.contains('hidden');
+}
+function openModelPicker() {
+  refreshModelGrid();
+  modelModal()?.classList.remove('hidden');
+  modelModal()?.setAttribute('aria-hidden', 'false');
+}
+function closeModelPicker() {
+  modelModal()?.classList.add('hidden');
+  modelModal()?.setAttribute('aria-hidden', 'true');
+}
+function refreshModelGrid() {
+  const grid = document.getElementById('model-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  CALCULATOR_MODELS.forEach((m, idx) => {
+    const card = document.createElement('button');
+    card.className = 'model-card' + (idx === modelIdx ? ' active' : '');
+    card.title = `${m.name} — ${m.desc || ''} (${idx + 1})`;
+    card.innerHTML =
+      `<span class="model-swatch" style="background:${m.swatch || '#111827'}"></span>` +
+      `<span class="model-name">${idx + 1}. ${m.name}</span>` +
+      `<span class="model-desc">${m.desc || ''}</span>` +
+      (idx === modelIdx ? `<span class="model-check">✓ Active</span>` : `<span class="model-check dim">Click to apply</span>`);
+    card.onclick = () => {
+      applyModel(idx, true);
+      blip(620, 0.07);
+      // keep picker open so user can preview others, double-click closes
+    };
+    card.ondblclick = () => closeModelPicker();
+    grid.appendChild(card);
+  });
 }
 
 /* ---- key handling ---- */
@@ -787,6 +867,17 @@ renderer.domElement.addEventListener('pointerdown', (e) => {
 });
 
 addEventListener('keydown', (e) => {
+  // model picker takes over number / arrow / esc keys while open
+  if (isModelPickerOpen()) {
+    if (e.key === 'Escape') { closeModelPicker(); return; }
+    if (e.key === 'Enter') { closeModelPicker(); return; }
+    if (e.key === 'ArrowRight') { cycleModel(1); return; }
+    if (e.key === 'ArrowLeft') { cycleModel(-1); return; }
+    const n = parseInt(e.key, 10);
+    if (n >= 1 && n <= CALCULATOR_MODELS.length) { applyModel(n - 1, true); blip(620, 0.07); return; }
+    if (e.key.toLowerCase() === 'm') { closeModelPicker(); return; }
+    return; // don't type into expression while picking
+  }
   if (/^[0-9]$/.test(e.key)) { insertText(e.key); flash(e.key); }
   else if (e.key === '.') { insertText('.'); flash('.'); }
   else if (e.key === '+') { insertText('+'); flash('+'); }
@@ -800,7 +891,7 @@ addEventListener('keydown', (e) => {
   else if (e.key === 'Enter' || e.key === '=') { doEquals(true); flash('='); }
   else if (e.key === 'Backspace') backspaceExpr();
   else if (e.key.toLowerCase() === 'c' || e.key === 'Escape') clearAll();
-  else if (e.key.toLowerCase() === 'm') { cycleModel(1); return; }
+  else if (e.key.toLowerCase() === 'm') { openModelPicker(); return; }
   else return;
   blip(520, 0.05);
 });
@@ -823,7 +914,16 @@ document.getElementById('btn-sound').onclick = (e) => {
   e.target.textContent = `Sound: ${soundOn ? 'on' : 'off'}`;
 };
 document.getElementById('btn-theme').onclick = () => applyTheme(themeIdx + 1);
-document.getElementById('btn-model').onclick = () => cycleModel(1);
+document.getElementById('btn-model').onclick = () => openModelPicker();
+document.getElementById('btn-model-close').onclick = () => closeModelPicker();
+document.getElementById('btn-model-prev').onclick = () => cycleModel(-1);
+document.getElementById('btn-model-next').onclick = () => cycleModel(1);
+modelModal()?.addEventListener('click', (e) => {
+  if (e.target.id === 'model-modal') closeModelPicker();
+});
+document.getElementById('model-badge').onclick = () => openModelPicker();
+document.getElementById('model-badge').style.cursor = 'pointer';
+document.getElementById('model-badge').title = 'Click to pick 3D model (M)';
 document.getElementById('btn-clear-history').onclick = () => {
   history = [];
   try { localStorage.removeItem('calc3d-history'); } catch {}
